@@ -12,3 +12,18 @@ FROM mcr.microsoft.com/vscode/devcontainers/javascript-node:0-${VARIANT}
 
 # [Optional] Uncomment if you want to install more global node modules
 RUN sudo -u node npm install -g gatsby-cli
+
+ADD . /app
+
+WORKDIR /app
+
+RUN yarn install 
+RUN yarn docsbuild
+
+FROM nginx:alpine
+
+COPY --from=0 /app/public /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
